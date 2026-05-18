@@ -1,4 +1,4 @@
-"""Streamlit entrypoint for PDF RAG Summarizer."""
+"""Streamlit entrypoint for the document intelligence RAG app."""
 
 from __future__ import annotations
 
@@ -21,24 +21,35 @@ def _show_context(chunks: list[dict]) -> None:
     with st.expander("Retrieved context preview", expanded=False):
         for idx, chunk in enumerate(chunks, start=1):
             distance = chunk.get("distance")
+            score = chunk.get("rerank_score", chunk.get("score"))
             distance_text = f"{distance:.4f}" if isinstance(distance, (int, float)) else "n/a"
+            score_text = f"{score:.4f}" if isinstance(score, (int, float)) else "n/a"
             st.markdown(
                 f"**{idx}. Page {chunk['page_number']} (chunk {chunk['chunk_index']}) "
-                f"| distance={distance_text}**"
+                f"| distance={distance_text} | score={score_text}**"
             )
             st.write(chunk["text"])
             st.divider()
 
 
 def main() -> None:
-    st.set_page_config(page_title="PDF RAG Summarizer", page_icon="PDF", layout="wide")
-    st.title("PDF RAG Summarizer")
-    st.caption("Upload a PDF, index it, then generate grounded summary and Q&A answers.")
+    st.set_page_config(page_title="Document Intelligence RAG", page_icon="DI", layout="wide")
+    st.title("Document Intelligence RAG")
+    st.caption(
+        "Upload a PDF, index it into ChromaDB or Pinecone, then generate grounded "
+        "summary and Q&A answers with citations."
+    )
 
     config = AppConfig()
     config.validate()
     store = EmbeddingsStore(config)
     rag = RAGService(config, store)
+
+    st.sidebar.header("Pipeline")
+    st.sidebar.write(f"Vector DB: `{config.vector_db}`")
+    st.sidebar.write(f"Embedding model: `{config.embedding_model}`")
+    st.sidebar.write(f"Reranking: `{'on' if config.rerank_enabled else 'off'}`")
+    st.sidebar.write(f"Top K: `{config.top_k}`")
 
     if "indexed" not in st.session_state:
         st.session_state.indexed = False

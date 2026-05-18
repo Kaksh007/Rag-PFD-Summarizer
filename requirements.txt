@@ -1,6 +1,15 @@
 streamlit
+fastapi
+uvicorn
+python-multipart
+pydantic
 pypdf
 chromadb
 sentence-transformers
 python-dotenv
 requests
+langchain
+langchain-core
+langgraph
+langchain-pinecone
+pinecone
