@@ -1,72 +1,34 @@
 # Deployment Guide
 
-## Local Demo
+## Recommended Hosting
 
-Use Streamlit when you want the easiest portfolio walkthrough:
-
-```powershell
-streamlit run streamlit_app.py
-```
-
-Use FastAPI when you want to demonstrate backend integration:
-
-```powershell
-uvicorn src.api:app --reload
-```
+Deploy on Streamlit Community Cloud or any host that supports Python + Streamlit.
 
 ## Environment Variables
 
-Required for all deployments:
+Set these in deployment secrets:
 
-- `VECTOR_DB`
+- `APP_MODE`
 - `CHUNK_SIZE`
 - `CHUNK_OVERLAP`
 - `TOP_K`
 - `EMBEDDING_MODEL`
-- `EMBEDDING_DIMENSION`
+- `CHROMA_PATH`
+- `COLLECTION_PREFIX`
 - `OLLAMA_BASE_URL`
 - `OLLAMA_MODEL`
 - `LLM_TIMEOUT_SECONDS`
 
-Required for local ChromaDB:
+## Notes
 
-- `CHROMA_PATH`
-- `COLLECTION_PREFIX`
+- This project uses local Ollama by default for a free setup.
+- For hosted/public demos, run against a reachable LLM endpoint compatible with the Ollama API shape (or extend `src/rag.py` provider logic).
+- Persist `CHROMA_PATH` to durable storage if your host supports it.
 
-Required for Pinecone:
+## Public Demo Steps
 
-- `PINECONE_API_KEY`
-- `PINECONE_INDEX_NAME`
-- `PINECONE_CLOUD`
-- `PINECONE_REGION`
-- `PINECONE_NAMESPACE`
-- `PINECONE_METRIC`
-
-Optional:
-
-- `RERANK_ENABLED`
-- `RERANK_MODEL`
-- `CITATION_STYLE`
-
-## Hosted Notes
-
-- ChromaDB is best for local demos or hosts with durable disk.
-- Pinecone is better for public demos because the vector index lives outside
-  the web server.
-- Ollama must be reachable from the deployed app. For public deployments, use a
-  reachable Ollama-compatible endpoint or extend `src/rag.py` with another LLM
-  provider.
-
-## Docker
-
-```powershell
-docker build -t document-intelligence-rag .
-docker run --env-file .env -p 8501:8501 document-intelligence-rag
-```
-
-For FastAPI in Docker, override the command:
-
-```powershell
-docker run --env-file .env -p 8000:8000 document-intelligence-rag `
-  uvicorn src.api:app --host 0.0.0.0 --port 8000
-```
+1. Open app URL.
+2. Upload a PDF.
+3. Click **Index PDF**.
+4. Click **Summarize document**.
+5. Ask one or two questions and inspect retrieved context preview.

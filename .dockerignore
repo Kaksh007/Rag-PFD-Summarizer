@@ -1,8 +1,0 @@
-.chroma
-.chroma_validation
-.venv
-venv
-__pycache__
-*.pyc
-.env
-.git
